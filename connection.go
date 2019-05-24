@@ -27,27 +27,27 @@ type SocketConnection struct {
 }
 
 // Dial - Will establish timedout dial against specified address. In this case, it will be freeswitch server
-func (c *SocketConnection) Dial(network string, addr string, timeout time.Duration) (net.Conn, error) {
+func (sc *SocketConnection) Dial(network string, addr string, timeout time.Duration) (net.Conn, error) {
 	return net.DialTimeout(network, addr, timeout)
 }
 
 // Send - Will send raw message to open net connection
-func (c *SocketConnection) Send(cmd string) error {
+func (sc *SocketConnection) Send(cmd string) error {
 
 	if strings.Contains(cmd, "\r\n") {
 		return fmt.Errorf(EInvalidCommandProvided, cmd)
 	}
 
 	// lock mutex
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	sc.mtx.Lock()
+	defer sc.mtx.Unlock()
 
-	_, err := io.WriteString(c, cmd)
+	_, err := io.WriteString(sc, cmd)
 	if err != nil {
 		return err
 	}
 
-	_, err = io.WriteString(c, "\r\n\r\n")
+	_, err = io.WriteString(sc, "\r\n\r\n")
 	if err != nil {
 		return err
 	}
@@ -56,10 +56,10 @@ func (c *SocketConnection) Send(cmd string) error {
 }
 
 // SendMany - Will loop against passed commands and return 1st error if error happens
-func (c *SocketConnection) SendMany(cmds []string) error {
+func (sc *SocketConnection) SendMany(cmds []string) error {
 
 	for _, cmd := range cmds {
-		if err := c.Send(cmd); err != nil {
+		if err := sc.Send(cmd); err != nil {
 			return err
 		}
 	}
@@ -68,34 +68,34 @@ func (c *SocketConnection) SendMany(cmds []string) error {
 }
 
 // SendEvent - Will loop against passed event headers
-func (c *SocketConnection) SendEvent(eventHeaders []string) error {
+func (sc *SocketConnection) SendEvent(eventHeaders []string) error {
 	if len(eventHeaders) <= 0 {
 		return fmt.Errorf(ECouldNotSendEvent, len(eventHeaders))
 	}
 
 	// lock mutex to prevent event headers from conflicting
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	sc.mtx.Lock()
+	defer sc.mtx.Unlock()
 
-	_, err := io.WriteString(c, "sendevent ")
+	_, err := io.WriteString(sc, "sendevent ")
 	if err != nil {
 		return err
 	}
 
 	for _, eventHeader := range eventHeaders {
-		_, err := io.WriteString(c, eventHeader)
+		_, err := io.WriteString(sc, eventHeader)
 		if err != nil {
 			return err
 		}
 
-		_, err = io.WriteString(c, "\r\n")
+		_, err = io.WriteString(sc, "\r\n")
 		if err != nil {
 			return err
 		}
 
 	}
 
-	_, err = io.WriteString(c, "\r\n")
+	_, err = io.WriteString(sc, "\r\n")
 	if err != nil {
 		return err
 	}
@@ -104,8 +104,8 @@ func (c *SocketConnection) SendEvent(eventHeaders []string) error {
 }
 
 // Execute - Helper fuck to execute commands with its args and sync/async mode
-func (c *SocketConnection) Execute(command, args string, sync bool) (m *Message, err error) {
-	return c.SendMsg(map[string]string{
+func (sc *SocketConnection) Execute(command, args string, sync bool) (m *Message, err error) {
+	return sc.SendMsg(map[string]string{
 		"call-command":     "execute",
 		"execute-app-name": command,
 		"execute-app-arg":  args,
@@ -114,8 +114,8 @@ func (c *SocketConnection) Execute(command, args string, sync bool) (m *Message,
 }
 
 // ExecuteUUID - Helper fuck to execute uuid specific commands with its args and sync/async mode
-func (c *SocketConnection) ExecuteUUID(uuid string, command string, args string, sync bool) (m *Message, err error) {
-	return c.SendMsg(map[string]string{
+func (sc *SocketConnection) ExecuteUUID(uuid string, command string, args string, sync bool) (m *Message, err error) {
+	return sc.SendMsg(map[string]string{
 		"call-command":     "execute",
 		"execute-app-name": command,
 		"execute-app-arg":  args,
@@ -124,7 +124,7 @@ func (c *SocketConnection) ExecuteUUID(uuid string, command string, args string,
 }
 
 // SendMsg - Basically this func will send message to the opened connection
-func (c *SocketConnection) SendMsg(msg map[string]string, uuid, data string) (m *Message, err error) {
+func (sc *SocketConnection) SendMsg(msg map[string]string, uuid, data string) (m *Message, err error) {
 
 	b := bytes.NewBufferString("sendmsg")
 
@@ -159,62 +159,62 @@ func (c *SocketConnection) SendMsg(msg map[string]string, uuid, data string) (m 
 	}
 
 	// lock mutex
-	c.mtx.Lock()
-	_, err = b.WriteTo(c)
+	sc.mtx.Lock()
+	_, err = b.WriteTo(sc)
 	if err != nil {
-		c.mtx.Unlock()
+		sc.mtx.Unlock()
 		return nil, err
 	}
-	c.mtx.Unlock()
+	sc.mtx.Unlock()
 
 	select {
-	case err := <-c.err:
+	case err := <-sc.err:
 		return nil, err
-	case m := <-c.m:
+	case m := <-sc.m:
 		return m, nil
 	}
 }
 
 // OriginatorAdd - Will return originator address known as net.RemoteAddr()
 // This will actually be a freeswitch address
-func (c *SocketConnection) OriginatorAddr() net.Addr {
-	return c.RemoteAddr()
+func (sc *SocketConnection) OriginatorAddr() net.Addr {
+	return sc.RemoteAddr()
 }
 
 // ReadMessage - Will read message from channels and return them back accordingy.
 // If error is received, error will be returned. If not, message will be returned back!
-func (c *SocketConnection) ReadMessage() (*Message, error) {
+func (sc *SocketConnection) ReadMessage() (*Message, error) {
 	Debug("Waiting for connection message to be received ...")
 
 	select {
-	case err := <-c.err:
+	case err := <-sc.err:
 		return nil, err
-	case msg := <-c.m:
+	case msg := <-sc.m:
 		return msg, nil
 	}
 }
 
 // Handle - Will handle new messages and close connection when there are no messages left to process
-func (c *SocketConnection) Handle() {
-	reader := bufio.NewReaderSize(c, ReadBufferSize)
+func (sc *SocketConnection) Handle() {
+	reader := bufio.NewReaderSize(sc, ReadBufferSize)
 	for {
 		msg, err := newMessage(reader, true)
 
 		if err != nil {
-			c.err <- err
+			sc.err <- err
 			break
 		}
 
-		c.m <- msg
+		sc.m <- msg
 	}
 
 	// Closing the connection now as there's nothing left to do ...
-	_ = c.Close()
+	_ = sc.Close()
 }
 
 // Close - Will close down net connection and return error if error happen
-func (c *SocketConnection) Close() error {
-	if err := c.Conn.Close(); err != nil {
+func (sc *SocketConnection) Close() error {
+	if err := sc.Conn.Close(); err != nil {
 		return err
 	}
 
