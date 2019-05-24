@@ -196,28 +196,20 @@ func (c *SocketConnection) ReadMessage() (*Message, error) {
 
 // Handle - Will handle new messages and close connection when there are no messages left to process
 func (c *SocketConnection) Handle() {
+	reader := bufio.NewReaderSize(c, ReadBufferSize)
+	for {
+		msg, err := newMessage(reader, true)
 
-	done := make(chan bool)
-
-	go func() {
-		reader := bufio.NewReaderSize(c, ReadBufferSize)
-		for {
-			msg, err := newMessage(reader, true)
-
-			if err != nil {
-				c.err <- err
-				done <- true
-				break
-			}
-
-			c.m <- msg
+		if err != nil {
+			c.err <- err
+			break
 		}
-	}()
 
-	<-done
+		c.m <- msg
+	}
 
 	// Closing the connection now as there's nothing left to do ...
-	c.Close()
+	_ = c.Close()
 }
 
 // Close - Will close down net connection and return error if error happen
