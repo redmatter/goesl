@@ -53,7 +53,7 @@ func (c *Client) Authenticate() error {
 	}
 
 	cmr, err := m.tr.ReadMIMEHeader()
-	if err != nil && err.Error() != "EOF" {
+	if cmr == nil || (err != nil && err.Error() != "EOF") {
 		Error(ECouldNotReadMIMEHeaders, err)
 		return err
 	}
@@ -72,7 +72,7 @@ func (c *Client) Authenticate() error {
 	}
 
 	am, err := m.tr.ReadMIMEHeader()
-	if err != nil && err.Error() != "EOF" {
+	if am == nil || (err != nil && err.Error() != "EOF") {
 		Error(ECouldNotReadMIMEHeaders, err)
 		return err
 	}
@@ -102,7 +102,7 @@ func NewClient(host string, port uint, passwd string, timeout int) (*Client, err
 
 	err = client.Authenticate()
 	if err != nil {
-		client.Close()
+		_ = client.Close()
 		return nil, err
 	}
 

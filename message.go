@@ -47,17 +47,16 @@ func (m *Message) GetHeader(key string) string {
 // Parse - Will parse out message received from Freeswitch and basically build it accordingly for later use.
 // However, in case of any issues func will return error.
 func (m *Message) Parse() error {
-
 	cmr, err := m.tr.ReadMIMEHeader()
 
-	if err != nil && err.Error() != "EOF" {
+	if cmr == nil || (err != nil && err.Error() != "EOF") {
 		Error(ECouldNotReadMIMEHeaders, err)
 		return err
 	}
 
 	if cmr.Get("Content-Type") == "" {
 		Debug("Not accepting message because of empty content type. Just whatever with it ...")
-		return fmt.Errorf("Parse EOF")
+		return fmt.Errorf("parse EOF")
 	}
 
 	// Will handle content length by checking if appropriate lenght is here and if it is than
@@ -131,12 +130,12 @@ func (m *Message) Parse() error {
 
 		// Copy back in:
 		for k, v := range decoded {
-			switch v.(type) {
+			switch value := v.(type) {
 			case string:
-				m.Headers[k] = v.(string)
+				m.Headers[k] = value
 			default:
 				//delete(m.Headers, k)
-				Warning("Removed non-string property (%s)", k)
+				Info("Removed non-string property (%s)", k)
 			}
 		}
 
@@ -197,7 +196,7 @@ func (m *Message) Dump() (resp string) {
 	return
 }
 
-// newMessage - Will build and execute parsing against received freeswitch message.
+// newMessage - Will build and execute parsing against received FreeSWITCH message.
 // As return will give brand new Message{} for you to use it.
 func newMessage(r *bufio.Reader, autoParse bool) (*Message, error) {
 
