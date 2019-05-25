@@ -4,7 +4,7 @@
 // I didn't write all of this code so you could say it's yours.
 // MIT License
 
-package client
+package main
 
 import (
 	"flag"
@@ -38,12 +38,12 @@ func main() {
 
 	// Apparently all is good... Let us now handle connection :)
 	// We don't want this to be inside of new connection as who knows where it my lead us.
-	// Remember that this is crutial part in handling incoming messages :)
+	// Remember that this is crucial part in handling incoming messages :)
 	go client.Handle()
 
-	client.Send("events json ALL")
+	_ = client.Send("events json ALL")
 
-	client.BgApi(fmt.Sprintf("originate %s %s", "sofia/internal/1001@127.0.0.1", "&socket(192.168.1.2:8084 async full)"))
+	_ = client.BgApi(fmt.Sprintf("originate %s %s", "sofia/internal/1001@127.0.0.1", "&socket(192.168.1.2:8084 async full)"))
 
 	for {
 		msg, err := client.ReadMessage()
