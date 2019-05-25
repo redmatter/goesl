@@ -37,35 +37,28 @@ func (s *OutboundServer) Start() error {
 		return err
 	}
 
-	quit := make(chan bool)
+	for {
+		Warning("Waiting for incoming connections ...")
 
-	go func() {
-		for {
-			Warning("Waiting for incoming connections ...")
+		c, err := s.Accept()
 
-			c, err := s.Accept()
-
-			if err != nil {
-				Error(EListenerConnection, err)
-				quit <- true
-				break
-			}
-
-			conn := SocketConnection{
-				Conn: c,
-				err:  make(chan error),
-				m:    make(chan *Message),
-			}
-
-			Notice("Got new connection from: %s", conn.OriginatorAddr())
-
-			go conn.Handle()
-
-			s.Conns <- conn
+		if err != nil {
+			Error(EListenerConnection, err)
+			break
 		}
-	}()
 
-	<-quit
+		conn := SocketConnection{
+			Conn: c,
+			err:  make(chan error),
+			m:    make(chan *Message),
+		}
+
+		Notice("Got new connection from: %s", conn.OriginatorAddr())
+
+		go conn.Handle()
+
+		s.Conns <- conn
+	}
 
 	// Stopping server itself ...
 	s.Stop()
