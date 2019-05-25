@@ -9,7 +9,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	. "github.com/0x19/goesl"
+	"github.com/0x19/goesl"
+	"github.com/0x19/goesl/log"
 	"runtime"
 	"strings"
 )
@@ -23,18 +24,20 @@ var (
 
 // Small client that will first make sure all events are returned as JSON and second, will originate
 func main() {
+	goesl.SetLogger(
+		log.NewLogger())
 
 	// Boost it as much as it can go ...
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	client, err := NewClient(*fshost, *fsport, *password, *timeout)
+	client, err := goesl.NewClient(*fshost, *fsport, *password, *timeout)
 
 	if err != nil {
-		Error("Error while creating new client: %s", err)
+		goesl.Error("Error while creating new client: %s", err)
 		return
 	}
 
-	Debug("Yuhu! New client: %q", client)
+	goesl.Debug("Yuhu! New client: %q", client)
 
 	// Apparently all is good... Let us now handle connection :)
 	// We don't want this to be inside of new connection as who knows where it my lead us.
@@ -52,11 +55,11 @@ func main() {
 
 			// If it contains EOF, we really dont care...
 			if !strings.Contains(err.Error(), "EOF") && err.Error() != "unexpected end of JSON input" {
-				Error("Error while reading Freeswitch message: %s", err)
+				goesl.Error("Error while reading Freeswitch message: %s", err)
 			}
 			break
 		}
 
-		Debug("%s", msg)
+		goesl.Debug("%s", msg)
 	}
 }
