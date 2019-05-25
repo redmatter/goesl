@@ -19,7 +19,7 @@ import (
 	"strings"
 )
 
-// Message - Freeswitch Message that is received by GoESL. Message struct is here to help with parsing message
+// Message - FreeSWITCH Message that is received by GoESL. Message struct is here to help with parsing message
 // and dumping its contents. In addition to that it's here to make sure received message is in fact message we wish/can support
 type Message struct {
 	Headers map[string]string
@@ -44,7 +44,7 @@ func (m *Message) GetHeader(key string) string {
 	return m.Headers[key]
 }
 
-// Parse - Will parse out message received from Freeswitch and basically build it accordingly for later use.
+// Parse - Will parse out message received from FreeSWITCH and basically build it accordingly for later use.
 // However, in case of any issues func will return error.
 func (m *Message) Parse() error {
 	cmr, err := m.tr.ReadMIMEHeader()
@@ -59,7 +59,7 @@ func (m *Message) Parse() error {
 		return fmt.Errorf("parse EOF")
 	}
 
-	// Will handle content length by checking if appropriate lenght is here and if it is than
+	// Will handle content length by checking if appropriate length is here and if it is than
 	// we are going to read it into body
 	if lv := cmr.Get("Content-Length"); lv != "" {
 		l, err := strconv.Atoi(lv)
@@ -85,7 +85,7 @@ func (m *Message) Parse() error {
 		return fmt.Errorf(EUnsupportedMessageType, msgType, AvailableMessageTypes)
 	}
 
-	// Assing message headers IF message is not type of event-json
+	// Check if message is not of type event-json
 	if msgType != "text/event-json" {
 		for k, v := range cmr {
 

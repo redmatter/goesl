@@ -11,12 +11,12 @@ func (sc *SocketConnection) ExecuteSet(key string, value string, sync bool) (m *
 	return sc.Execute("set", key+"="+value, sync)
 }
 
-// ExecuteHangup - Helper desgned to help with executing Answer against active ESL session
+// ExecuteHangup - Helper designed to help with executing Answer against active ESL session
 func (sc *SocketConnection) ExecuteAnswer(args string, sync bool) (m *Message, err error) {
 	return sc.Execute("answer", args, sync)
 }
 
-// ExecuteHangup - Helper desgned to help with executing Hangup against active ESL session
+// ExecuteHangup - Helper designed to help with executing Hangup against active ESL session
 func (sc *SocketConnection) ExecuteHangup(uuid string, args string, sync bool) (m *Message, err error) {
 	if uuid != "" {
 		return sc.ExecuteUUID(uuid, "hangup", args, sync)

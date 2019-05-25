@@ -14,7 +14,7 @@ import (
 	"syscall"
 )
 
-// OutboundServer - In case you need to start server, this Struct have it covered
+// OutboundServer - In case you need to start server, this struct have it covered
 type OutboundServer struct {
 	net.Listener
 
@@ -26,7 +26,7 @@ type OutboundServer struct {
 
 // Start - Will start new outbound server
 func (s *OutboundServer) Start() error {
-	Notice("Starting Freeswitch Outbound Server @ (address: %s) ...", s.Addr)
+	Notice("Starting FreeSWITCH Outbound Server @ (address: %s) ...", s.Addr)
 
 	var err error
 
@@ -69,10 +69,10 @@ func (s *OutboundServer) Start() error {
 // Stop - Will close server connection once SIGTERM/Interrupt is received
 func (s *OutboundServer) Stop() {
 	Warning("Stopping Outbound Server ...")
-	s.Close()
+	_ = s.Close()
 }
 
-// NewOutboundServer - Will instanciate new outbound server
+// NewOutboundServer - Will instantiate new outbound server
 func NewOutboundServer(addr string) (*OutboundServer, error) {
 	if len(addr) < 2 {
 		addr = os.Getenv("GOESL_OUTBOUND_SERVER_ADDR")

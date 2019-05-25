@@ -18,7 +18,7 @@ var (
 	EListenerConnection      = "listener connection error: %s"
 	EInvalidServerAddr       = "please make sure to pass along valid address. You've passed: \"%s\""
 	EUnexpectedAuthHeader    = "expected auth/request content type. Got %s"
-	EInvalidPassword         = "could not authenticate against freeSWITCH with provided password: %s"
+	EInvalidPassword         = "could not authenticate against FreeSWITCH with provided password: %s"
 	ECouldNotCreateMessage   = "error while creating new message: %s"
 	ECouldNotSendEvent       = "must send at least one event header, detected `%d` header"
 )

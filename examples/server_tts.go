@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	goeslMessage = "Hello from GoESL. Open source freeswitch event socket wrapper written in Golang!"
+	goeslMessage = "Hello from GoESL. Open source FreeSWITCH event socket wrapper written in Golang!"
 )
 
 func main() {
@@ -28,10 +28,10 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	if s, err := NewOutboundServer(":8084"); err != nil {
-		Error("Got error while starting Freeswitch outbound server: %s", err)
+		Error("Got error while starting FreeSWITCH outbound server: %s", err)
 	} else {
 		go handleTTS(s)
-		s.Start()
+		_ = s.Start()
 	}
 
 }
@@ -44,7 +44,7 @@ func handleTTS(s *OutboundServer) {
 		select {
 
 		case conn := <-s.Conns:
-			Notice("New incomming connection: %v", conn)
+			Notice("New incoming connection: %v", conn)
 
 			if err := conn.Connect(); err != nil {
 				Error("Got error while accepting connection: %s", err)
@@ -97,7 +97,7 @@ func handleTTS(s *OutboundServer) {
 
 						// If it contains EOF, we really dont care...
 						if !strings.Contains(err.Error(), "EOF") {
-							Error("Error while reading Freeswitch message: %s", err)
+							Error("Error while reading FreeSWITCH message: %s", err)
 						}
 						break
 					}

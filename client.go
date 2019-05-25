@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-// Client - In case you need to do inbound dialing against freeswitch server in order to originate call or see
+// Client - In case you need to do inbound dialing against FreeSWITCH server in order to originate call or see
 // sofia statuses or whatever else you came up with
 type Client struct {
 	SocketConnection
@@ -26,7 +26,7 @@ type Client struct {
 	Timeout int    `json:"freeswitch_connection_timeout"`
 }
 
-// EstablishConnection - Will attempt to establish connection against freeswitch and create new SocketConnection
+// EstablishConnection - Will attempt to establish connection against FreeSWITCH and create new SocketConnection
 func (c *Client) EstablishConnection() error {
 	conn, err := c.Dial(c.Proto, c.Addr, time.Duration(c.Timeout*int(time.Second)))
 	if err != nil {
@@ -42,8 +42,7 @@ func (c *Client) EstablishConnection() error {
 	return nil
 }
 
-// Authenticate - Method used to authenticate client against freeswitch. In case of any errors durring so
-// we will return error.
+// Authenticate - Method used to authenticate client against FreeSWITCH.
 func (c *Client) Authenticate() error {
 
 	m, err := newMessage(bufio.NewReaderSize(c, ReadBufferSize), false)
@@ -86,12 +85,12 @@ func (c *Client) Authenticate() error {
 }
 
 // NewClient - Will initiate new client that will establish connection and attempt to authenticate
-// against connected freeswitch server
-func NewClient(host string, port uint, passwd string, timeout int) (*Client, error) {
+// against connected FreeSWITCH server
+func NewClient(host string, port uint, password string, timeout int) (*Client, error) {
 	client := Client{
 		Proto:   "tcp", // Let me know if you ever need this open up lol
 		Addr:    net.JoinHostPort(host, strconv.Itoa(int(port))),
-		Passwd:  passwd,
+		Passwd:  password,
 		Timeout: timeout,
 	}
 

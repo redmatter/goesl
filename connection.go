@@ -26,7 +26,7 @@ type SocketConnection struct {
 	mtx sync.Mutex
 }
 
-// Dial - Will establish timedout dial against specified address. In this case, it will be freeswitch server
+// Dial - Will establish timed-out dial against specified address. In this case, it will be FreeSWITCH server
 func (sc *SocketConnection) Dial(network string, addr string, timeout time.Duration) (net.Conn, error) {
 	return net.DialTimeout(network, addr, timeout)
 }
@@ -176,12 +176,12 @@ func (sc *SocketConnection) SendMsg(msg map[string]string, uuid, data string) (m
 }
 
 // OriginatorAdd - Will return originator address known as net.RemoteAddr()
-// This will actually be a freeswitch address
+// This will actually be a FreeSWITCH address
 func (sc *SocketConnection) OriginatorAddr() net.Addr {
 	return sc.RemoteAddr()
 }
 
-// ReadMessage - Will read message from channels and return them back accordingy.
+// ReadMessage - Will read message from channels and return them back accordingly.
 // If error is received, error will be returned. If not, message will be returned back!
 func (sc *SocketConnection) ReadMessage() (*Message, error) {
 	Debug("Waiting for connection message to be received ...")
