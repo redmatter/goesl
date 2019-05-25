@@ -6,45 +6,56 @@
 
 package goesl
 
-import (
-	"os"
+type Logger interface {
+	Debugf(message string, args ...interface{})
+	Errorf(message string, args ...interface{})
+	Noticef(message string, args ...interface{})
+	Infof(message string, args ...interface{})
+	Warningf(message string, args ...interface{})
+}
 
-	"github.com/op/go-logging"
-)
+var log Logger
 
-var (
-	log = logging.MustGetLogger("goesl")
-
-	// Example format string. Everything except the message has a custom color
-	// which is dependent on the log level. Many fields have a custom output
-	// formatting too, eg. the time returns the hour down to the milli second.
-	format = logging.MustStringFormatter(
-		"%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.8s}%{color:reset} %{message}",
-	)
-)
+func SetLogger(l Logger) {
+	log = l
+}
 
 func Debug(message string, args ...interface{}) {
+	if log == nil {
+		return
+	}
+
 	log.Debugf(message, args...)
 }
 
 func Error(message string, args ...interface{}) {
+	if log == nil {
+		return
+	}
+
 	log.Errorf(message, args...)
 }
 
 func Notice(message string, args ...interface{}) {
+	if log == nil {
+		return
+	}
+
 	log.Noticef(message, args...)
 }
 
 func Info(message string, args ...interface{}) {
+	if log == nil {
+		return
+	}
+
 	log.Infof(message, args...)
 }
 
 func Warning(message string, args ...interface{}) {
-	log.Warningf(message, args...)
-}
+	if log == nil {
+		return
+	}
 
-func init() {
-	backend := logging.NewLogBackend(os.Stderr, "", 0)
-	formatter := logging.NewBackendFormatter(backend, format)
-	logging.SetBackend(formatter)
+	log.Warningf(message, args...)
 }

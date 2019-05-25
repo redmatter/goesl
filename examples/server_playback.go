@@ -39,14 +39,14 @@ func main() {
 	if s, err := NewOutboundServer(":8084"); err != nil {
 		Error("Got error while starting Freeswitch outbound server: %s", err)
 	} else {
-		go handle(s)
+		go handlePlayback(s)
 		s.Start()
 	}
 
 }
 
-// handle - Running under goroutine here to explain how to handle playback ( play to the caller )
-func handle(s *OutboundServer) {
+// handlePlayback - Running under goroutine here to explain how to handle playback ( play to the caller )
+func handlePlayback(s *OutboundServer) {
 
 	for {
 

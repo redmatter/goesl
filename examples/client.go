@@ -15,10 +15,10 @@ import (
 )
 
 var (
-	fshost   = flag.String("fshost", "localhost", "Freeswitch hostname. Default: localhost")
-	fsport   = flag.Uint("fsport", 8021, "Freeswitch port. Default: 8021")
-	password = flag.String("pass", "ClueCon", "Freeswitch password. Default: ClueCon")
-	timeout  = flag.Int("timeout", 10, "Freeswitch conneciton timeout in seconds. Default: 10")
+	fshost   = flag.String("fshost", "localhost", "FreeSWITCH hostname. Default: localhost")
+	fsport   = flag.Uint("fsport", 8021, "FreeSWITCH port. Default: 8021")
+	password = flag.String("pass", "ClueCon", "FreeSWITCH password. Default: ClueCon")
+	timeout  = flag.Int("timeout", 10, "FreeSWITCH connection timeout in seconds. Default: 10")
 )
 
 // Small client that will first make sure all events are returned as JSON and second, will originate

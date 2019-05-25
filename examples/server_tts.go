@@ -30,14 +30,14 @@ func main() {
 	if s, err := NewOutboundServer(":8084"); err != nil {
 		Error("Got error while starting Freeswitch outbound server: %s", err)
 	} else {
-		go handle(s)
+		go handleTTS(s)
 		s.Start()
 	}
 
 }
 
-// handle - Running under goroutine here to explain how to run tts outbound server
-func handle(s *OutboundServer) {
+// handleTTS - Running under goroutine here to explain how to run tts outbound server
+func handleTTS(s *OutboundServer) {
 
 	for {
 
