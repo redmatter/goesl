@@ -9,7 +9,7 @@ package main
 import (
 	"fmt"
 	"github.com/0x19/goesl"
-	"github.com/0x19/goesl/log"
+	"github.com/0x19/goesl/examples/log"
 	"os"
 	"runtime"
 	"strings"

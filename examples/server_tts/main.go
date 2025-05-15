@@ -8,7 +8,7 @@ package main
 
 import (
 	"github.com/0x19/goesl"
-	"github.com/0x19/goesl/log"
+	"github.com/0x19/goesl/examples/log"
 	"runtime"
 	"strings"
 )
