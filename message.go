@@ -14,6 +14,7 @@ import (
 	"io"
 	"net/textproto"
 	"net/url"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -81,7 +82,7 @@ func (m *Message) Parse() error {
 
 	Debug("Got message content (type: %s). Searching if we can handle it ...", msgType)
 
-	if !StringInSlice(msgType, AvailableMessageTypes) {
+	if !slices.Contains(AvailableMessageTypes, msgType) {
 		return fmt.Errorf(EUnsupportedMessageType, msgType, AvailableMessageTypes)
 	}
 
