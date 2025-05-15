@@ -103,7 +103,7 @@ func (sc *SocketConnection) SendEvent(eventHeaders []string) error {
 	return nil
 }
 
-// Execute - Helper fuck to execute commands with its args and sync/async mode
+// Execute - Helper to execute commands with its args and sync/async mode
 func (sc *SocketConnection) Execute(command, args string, sync bool) (m *Message, err error) {
 	return sc.SendMsg(map[string]string{
 		"call-command":     "execute",
@@ -113,7 +113,7 @@ func (sc *SocketConnection) Execute(command, args string, sync bool) (m *Message
 	}, "", "")
 }
 
-// ExecuteUUID - Helper fuck to execute uuid specific commands with its args and sync/async mode
+// ExecuteUUID - Helper to execute uuid specific commands with its args and sync/async mode
 func (sc *SocketConnection) ExecuteUUID(uuid string, command string, args string, sync bool) (m *Message, err error) {
 	return sc.SendMsg(map[string]string{
 		"call-command":     "execute",
@@ -182,7 +182,7 @@ func (sc *SocketConnection) OriginatorAddr() net.Addr {
 }
 
 // ReadMessage - Will read message from channels and return them back accordingly.
-// If error is received, error will be returned. If not, message will be returned back!
+//  If error is received, error will be returned. If not, message will be returned back!
 func (sc *SocketConnection) ReadMessage() (*Message, error) {
 	Debug("Waiting for connection message to be received ...")
 
