@@ -71,7 +71,7 @@ func (m *Message) Parse() error {
 		m.Body = make([]byte, l)
 
 		if _, err := io.ReadFull(m.r, m.Body); err != nil {
-			return fmt.Errorf("%w; %w", ErrCouldNotReadyBody, err)
+			return fmt.Errorf("%w; %w", ErrCouldNotReadBody, err)
 		}
 	}
 
@@ -165,7 +165,7 @@ func (m *Message) Parse() error {
 			m.Body = make([]byte, length)
 
 			if _, err = io.ReadFull(r, m.Body); err != nil {
-				return fmt.Errorf("%w; %w", ErrCouldNotReadyBody, err)
+				return fmt.Errorf("%w; %w", ErrCouldNotReadBody, err)
 			}
 		}
 	}

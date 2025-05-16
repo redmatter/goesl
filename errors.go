@@ -13,7 +13,7 @@ var (
 	ErrCouldNotReadMIMEHeaders = fmt.Errorf("error while reading MIME headers")
 	ErrInvalidContentLength    = fmt.Errorf("unable to get size of content-length")
 	ErrUnsuccessfulReply       = fmt.Errorf("got error while reading from reply command")
-	ErrCouldNotReadyBody       = fmt.Errorf("got error while reading reader body")
+	ErrCouldNotReadBody        = fmt.Errorf("got error while reading reader body")
 	ErrUnsupportedMessageType  = fmt.Errorf("unsupported message type")
 	ErrCouldNotStartListener   = fmt.Errorf("got error while attempting to start listener")
 	ErrInvalidServerAddr       = fmt.Errorf("invalid server address")
