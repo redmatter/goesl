@@ -51,8 +51,7 @@ func (m *Message) Parse() error {
 	cmr, err := m.tr.ReadMIMEHeader()
 
 	if cmr == nil || (err != nil && err.Error() != "EOF") {
-		Error(ECouldNotReadMIMEHeaders, err)
-		return err
+		return fmt.Errorf("%w; %w", ErrCouldNotReadMIMEHeaders, err)
 	}
 
 	if cmr.Get("Content-Type") == "" {
@@ -66,15 +65,13 @@ func (m *Message) Parse() error {
 		l, err := strconv.Atoi(lv)
 
 		if err != nil {
-			Error(EInvalidContentLength, err)
-			return err
+			return fmt.Errorf("%w; %w", ErrInvalidContentLength, err)
 		}
 
 		m.Body = make([]byte, l)
 
 		if _, err := io.ReadFull(m.r, m.Body); err != nil {
-			Error(ECouldNotReadyBody, err)
-			return err
+			return fmt.Errorf("%w; %w", ErrCouldNotReadyBody, err)
 		}
 	}
 
@@ -83,7 +80,7 @@ func (m *Message) Parse() error {
 	Debug("Got message content (type: %s). Searching if we can handle it ...", msgType)
 
 	if !slices.Contains(AvailableMessageTypes, msgType) {
-		return fmt.Errorf(EUnsupportedMessageType, msgType, AvailableMessageTypes)
+		return fmt.Errorf("%w! We got '%s'. Supported types are: %v ", ErrUnsupportedMessageType, msgType, AvailableMessageTypes)
 	}
 
 	// Check if message is not of type event-json
@@ -97,7 +94,7 @@ func (m *Message) Parse() error {
 				m.Headers[k], err = url.QueryUnescape(v[0])
 
 				if err != nil {
-					Error(ECouldNotDecode, err)
+					Error("could not decode/unescape message: %s", err)
 					continue
 				}
 			}
@@ -113,11 +110,11 @@ func (m *Message) Parse() error {
 		reply := cmr.Get("Reply-Text")
 
 		if strings.Contains(reply, "-ERR") {
-			return fmt.Errorf(EUnsuccessfulReply, reply[5:])
+			return fmt.Errorf("%w; %s", ErrUnsuccessfulReply, reply[5:])
 		}
 	case "api/response":
 		if strings.Contains(string(m.Body), "-ERR") {
-			return fmt.Errorf(EUnsuccessfulReply, string(m.Body)[5:])
+			return fmt.Errorf("%w; %s", ErrUnsuccessfulReply, string(m.Body)[5:])
 		}
 	case "text/event-json":
 		// OK, what is missing here is a way to interpret other JSON types - it expects string only (understandably
@@ -155,22 +152,20 @@ func (m *Message) Parse() error {
 		emh, err := tr.ReadMIMEHeader()
 
 		if err != nil {
-			return fmt.Errorf(ECouldNotReadMIMEHeaders, err)
+			return fmt.Errorf("%w; %w", ErrCouldNotReadMIMEHeaders, err)
 		}
 
 		if vl := emh.Get("Content-Length"); vl != "" {
 			length, err := strconv.Atoi(vl)
 
 			if err != nil {
-				Error(EInvalidContentLength, err)
-				return err
+				return fmt.Errorf("%w; %w", ErrInvalidContentLength, err)
 			}
 
 			m.Body = make([]byte, length)
 
 			if _, err = io.ReadFull(r, m.Body); err != nil {
-				Error(ECouldNotReadyBody, err)
-				return err
+				return fmt.Errorf("%w; %w", ErrCouldNotReadyBody, err)
 			}
 		}
 	}

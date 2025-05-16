@@ -33,8 +33,7 @@ func (s *OutboundServer) Start() error {
 	s.Listener, err = net.Listen(s.Proto, s.Addr)
 
 	if err != nil {
-		Error(ECouldNotStartListener, err)
-		return err
+		return fmt.Errorf("%w; %w", ErrCouldNotStartListener, err)
 	}
 
 	for {
@@ -43,7 +42,7 @@ func (s *OutboundServer) Start() error {
 		c, err := s.Accept()
 
 		if err != nil {
-			Error(EListenerConnection, err)
+			Error("listener connection error: %s", err)
 			break
 		}
 
@@ -78,7 +77,7 @@ func NewOutboundServer(addr string) (*OutboundServer, error) {
 		addr = os.Getenv("GOESL_OUTBOUND_SERVER_ADDR")
 
 		if addr == "" {
-			return nil, fmt.Errorf(EInvalidServerAddr, addr)
+			return nil, fmt.Errorf("%w; %s", ErrInvalidServerAddr, addr)
 		}
 	}
 

@@ -47,21 +47,18 @@ func (c *Client) Authenticate() error {
 
 	m, err := newMessage(bufio.NewReaderSize(c, ReadBufferSize), false)
 	if err != nil {
-		Error(ECouldNotCreateMessage, err)
-		return err
+		return fmt.Errorf("%w; %w", ErrCouldNotCreateMessage, err)
 	}
 
 	cmr, err := m.tr.ReadMIMEHeader()
 	if cmr == nil || (err != nil && err.Error() != "EOF") {
-		Error(ECouldNotReadMIMEHeaders, err)
-		return err
+		return fmt.Errorf("%w; %w", ErrCouldNotReadMIMEHeaders, err)
 	}
 
 	Debug("A: %v\n", cmr)
 
 	if cmr.Get("Content-Type") != "auth/request" {
-		Error(EUnexpectedAuthHeader, cmr.Get("Content-Type"))
-		return fmt.Errorf(EUnexpectedAuthHeader, cmr.Get("Content-Type"))
+		return fmt.Errorf("%w; %s", ErrUnexpectedAuthHeader, cmr.Get("Content-Type"))
 	}
 
 	s := "auth " + c.Passwd + "\r\n\r\n"
@@ -72,13 +69,11 @@ func (c *Client) Authenticate() error {
 
 	am, err := m.tr.ReadMIMEHeader()
 	if am == nil || (err != nil && err.Error() != "EOF") {
-		Error(ECouldNotReadMIMEHeaders, err)
-		return err
+		return fmt.Errorf("%w; %w", ErrCouldNotReadMIMEHeaders, err)
 	}
 
 	if am.Get("Reply-Text") != "+OK accepted" {
-		Error(EInvalidPassword, c.Passwd)
-		return fmt.Errorf(EInvalidPassword, c.Passwd)
+		return ErrInvalidPassword
 	}
 
 	return nil

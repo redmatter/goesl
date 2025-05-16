@@ -35,7 +35,7 @@ func (sc *SocketConnection) Dial(network string, addr string, timeout time.Durat
 func (sc *SocketConnection) Send(cmd string) error {
 
 	if strings.Contains(cmd, "\r\n") {
-		return fmt.Errorf(EInvalidCommandProvided, cmd)
+		return fmt.Errorf("%w; %q", ErrInvalidCommandProvided, cmd)
 	}
 
 	// lock mutex
@@ -70,7 +70,7 @@ func (sc *SocketConnection) SendMany(cmds []string) error {
 // SendEvent - Will loop against passed event headers
 func (sc *SocketConnection) SendEvent(eventHeaders []string) error {
 	if len(eventHeaders) <= 0 {
-		return fmt.Errorf(ECouldNotSendEvent, len(eventHeaders))
+		return ErrCouldNotSendEvent
 	}
 
 	// lock mutex to prevent event headers from conflicting
@@ -124,13 +124,13 @@ func (sc *SocketConnection) ExecuteUUID(uuid string, command string, args string
 }
 
 // SendMsg - Basically this func will send message to the opened connection
-func (sc *SocketConnection) SendMsg(msg map[string]string, uuid, data string) (m *Message, err error) {
+func (sc *SocketConnection) SendMsg(headers map[string]string, uuid, data string) (m *Message, err error) {
 
 	b := bytes.NewBufferString("sendmsg")
 
 	if uuid != "" {
 		if strings.Contains(uuid, "\r\n") {
-			return nil, fmt.Errorf(EInvalidCommandProvided, msg)
+			return nil, fmt.Errorf("%w; invalid uuid %q", ErrInvalidCommandProvided, uuid)
 		}
 
 		b.WriteString(" " + uuid)
@@ -138,14 +138,14 @@ func (sc *SocketConnection) SendMsg(msg map[string]string, uuid, data string) (m
 
 	b.WriteString("\n")
 
-	for k, v := range msg {
+	for k, v := range headers {
 		if strings.Contains(k, "\r\n") {
-			return nil, fmt.Errorf(EInvalidCommandProvided, msg)
+			return nil, fmt.Errorf("%w; invalid header name %q", ErrInvalidCommandProvided, k)
 		}
 
 		if v != "" {
 			if strings.Contains(v, "\r\n") {
-				return nil, fmt.Errorf(EInvalidCommandProvided, msg)
+				return nil, fmt.Errorf("%w; invalid header value %q", ErrInvalidCommandProvided, v)
 			}
 
 			b.WriteString(fmt.Sprintf("%s: %s\n", k, v))
@@ -154,7 +154,7 @@ func (sc *SocketConnection) SendMsg(msg map[string]string, uuid, data string) (m
 
 	b.WriteString("\n")
 
-	if msg["content-length"] != "" && data != "" {
+	if headers["content-length"] != "" && data != "" {
 		b.WriteString(data)
 	}
 

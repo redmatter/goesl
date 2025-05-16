@@ -6,19 +6,19 @@
 
 package goesl
 
+import "fmt"
+
 var (
-	EInvalidCommandProvided  = "invalid command provided. Command cannot contain \\r and/or \\n. Provided command is: %s"
-	ECouldNotReadMIMEHeaders = "error while reading MIME headers: %s"
-	EInvalidContentLength    = "unable to get size of content-length: %s"
-	EUnsuccessfulReply       = "got error while reading from reply command: %s"
-	ECouldNotReadyBody       = "got error while reading reader body: %s"
-	EUnsupportedMessageType  = "unsupported message type! We got '%s'. Supported types are: %v "
-	ECouldNotDecode          = "could not decode/unescape message: %s"
-	ECouldNotStartListener   = "got error while attempting to start listener: %s"
-	EListenerConnection      = "listener connection error: %s"
-	EInvalidServerAddr       = "please make sure to pass along valid address. You've passed: \"%s\""
-	EUnexpectedAuthHeader    = "expected auth/request content type. Got %s"
-	EInvalidPassword         = "could not authenticate against FreeSWITCH with provided password: %s"
-	ECouldNotCreateMessage   = "error while creating new message: %s"
-	ECouldNotSendEvent       = "must send at least one event header, detected `%d` header"
+	ErrInvalidCommandProvided  = fmt.Errorf("invalid command provided")
+	ErrCouldNotReadMIMEHeaders = fmt.Errorf("error while reading MIME headers")
+	ErrInvalidContentLength    = fmt.Errorf("unable to get size of content-length")
+	ErrUnsuccessfulReply       = fmt.Errorf("got error while reading from reply command")
+	ErrCouldNotReadyBody       = fmt.Errorf("got error while reading reader body")
+	ErrUnsupportedMessageType  = fmt.Errorf("unsupported message type")
+	ErrCouldNotStartListener   = fmt.Errorf("got error while attempting to start listener")
+	ErrInvalidServerAddr       = fmt.Errorf("invalid server address")
+	ErrUnexpectedAuthHeader    = fmt.Errorf("unexpected auth/request content type")
+	ErrInvalidPassword         = fmt.Errorf("invalid password")
+	ErrCouldNotCreateMessage   = fmt.Errorf("error while creating new message")
+	ErrCouldNotSendEvent       = fmt.Errorf("must send at least one event header")
 )
